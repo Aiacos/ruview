@@ -24,10 +24,10 @@ CSI_SOURCE=simulated docker compose -f docker-compose.casaos.yml up -d
 Then open the dashboard:
 
 ```
-http://<host-ip>:3030/ui/index.html
+http://<host-ip>:3000/ui/index.html
 ```
 
-> The bare root `http://<host-ip>:3030/` is only an **API index** (a plain list
+> The bare root `http://<host-ip>:3000/` is only an **API index** (a plain list
 > of endpoints) — the visual dashboards live under `/ui/`:
 > `index.html` (main), `observatory.html` (live feed), `pose-fusion.html`
 > (webcam + CSI), `viz.html` (3D).
@@ -45,18 +45,19 @@ docker compose -f docker-compose.casaos.yml down
 
 ## 2. Ports
 
-The compose file (`docker-compose.casaos.yml`) publishes **non-default host
-ports** because 3000/3001 are commonly already in use:
+The compose file (`docker-compose.casaos.yml`) publishes these host ports:
 
-| Service                | Container | Host (this compose) | Notes |
-|------------------------|-----------|---------------------|-------|
-| REST API + web UI      | 3000/tcp  | **3030**            | Dashboard lives here (`/`, `/ui/...`) |
-| WebSocket sensing feed | 3001/tcp  | **3031**            | `ws://host:3031/ws/sensing` |
-| ESP32 CSI ingest       | 5005/udp  | **5005**            | ESP32-S3 nodes stream CSI frames here |
+| Service                | Container | Host | Notes |
+|------------------------|-----------|------|-------|
+| REST API + web UI      | 3000/tcp  | **3000** | Dashboard lives here (`/`, `/ui/...`) |
+| WebSocket sensing feed | 3001/tcp  | **3001** | `ws://host:3001/ws/sensing` |
+| ESP32 CSI ingest       | 5005/udp  | **5005** | ESP32-S3 nodes stream CSI frames here |
 
 If a host port clashes on your machine, edit the `published:` values in
-`docker-compose.casaos.yml`. The dashboard's WebSocket URL is derived from the
-page host, so keep the API and WS ports reachable from the same hostname.
+`docker-compose.casaos.yml` (and update `port_map` / `webui_port` in the
+`x-casaos` block to match the new UI port). The dashboard's WebSocket URL is
+derived from the page host, so keep the API and WS ports reachable from the same
+hostname.
 
 Verified endpoints (all return `200` once running):
 
@@ -111,22 +112,20 @@ description, port map), so CasaOS shows it as a proper app tile.
    customized app").
 2. Switch to the **Import** / YAML view and paste the contents of
    `docker-compose.casaos.yml`.
-3. Install. The tile opens `http://<host-ip>:3030/ui/index.html`.
+3. Install. The tile opens `http://<host-ip>:3000/ui/index.html`.
 
 **Option B — CLI (CasaOS still detects the container)**
 
 ```bash
-cd /DATA/AppData/ruview
+cd ruview
 docker compose -f docker-compose.casaos.yml up -d
 ```
 
 > **Icon:** the manifest points at
-> `https://cdn.jsdelivr.net/gh/Aiacos/ruview@main/assets/ruview-icon.png`.
-> jsDelivr serves it from the GitHub repo, so commit & push `assets/ruview-icon.png`
-> to the `main` branch for the icon to resolve. Until then CasaOS shows a
-> placeholder; everything else works. To use a fully local icon instead, replace
-> both `icon:` URLs (in `labels:` and `x-casaos:`) with a file path served by your
-> own host.
+> `https://cdn.jsdelivr.net/gh/ruvnet/RuView@main/assets/ruview-icon.png`
+> (jsDelivr serves `assets/ruview-icon.png` straight from the repo). To use a
+> different or fully local icon, replace both `icon:` URLs (in `labels:` and
+> `x-casaos:`) with another URL or a file path served by your own host.
 
 ---
 
@@ -162,7 +161,7 @@ docker compose -f docker-compose.casaos.yml pull
 docker compose -f docker-compose.casaos.yml up -d
 
 # Status of the running server
-curl -s http://<host-ip>:3030/api/v1/status
+curl -s http://<host-ip>:3000/api/v1/status
 ```
 
 **Troubleshooting**
@@ -172,4 +171,4 @@ curl -s http://<host-ip>:3030/api/v1/status
 - *Multiple ESP32 nodes on Docker Desktop for Windows:* multi-source UDP collapses
   to one source IP at the WSL boundary. Use the host relay (see
   `docs/TROUBLESHOOTING.md §9`). Native Linux/CasaOS hosts are unaffected.
-- *Port clash on 3030/3031:* edit `published:` in `docker-compose.casaos.yml`.
+- *Port clash on 3000/3001:* edit `published:` in `docker-compose.casaos.yml`.

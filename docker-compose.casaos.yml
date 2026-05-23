@@ -1,21 +1,20 @@
 # RuView — WiFi DensePose sensing server, CasaOS-ready compose.
 #
-# Uses the prebuilt image (amd64) from Docker Hub, so the CasaOS host does NOT
-# need to compile the Rust workspace. (This server is amd64. For arm64 hosts the
-# published tag has no arm64 layer yet — build locally with the dev compose:
-# `docker compose -f docker/docker-compose.yml build`.) The server hosts the
-# REST API + web UI on one port, a WebSocket stream, and a UDP listener for
-# ESP32-S3 CSI nodes.
-#
-# Host ports were chosen to avoid clashes on this server (3000/3001 are already
-# in use): the UI is published on 3030, the WebSocket on 3031, ESP32 CSI on 5005/udp.
+# Uses the prebuilt image from Docker Hub, so the host does NOT need to compile
+# the Rust workspace. (The published `:latest` tag is amd64; on arm64 hosts build
+# locally first: `docker compose -f docker/docker-compose.yml build`.) The server
+# hosts the REST API + web UI on one port, a WebSocket stream, and a UDP listener
+# for ESP32-S3 CSI nodes.
 #
 # Import into CasaOS:  App Store → Custom Install → paste this file, OR
-#   cd /DATA/AppData/ruview && docker compose -f docker-compose.casaos.yml up -d
+#   docker compose -f docker-compose.casaos.yml up -d
 #
-# Open the dashboard at:  http://192.168.1.177:3030/ui/index.html
-# (the bare http://<host>:3030/ root is just an API index — the visual
+# Open the dashboard at:  http://<host-ip>:3000/ui/index.html
+# (the bare http://<host-ip>:3000/ root is just an API index — the visual
 #  dashboards live under /ui/: index.html, observatory.html, pose-fusion.html)
+#
+# If host ports 3000/3001 are already taken on your machine, change the
+# `published:` values below (and `port_map` / `webui_port` to match the new UI port).
 #
 # Data source (CSI_SOURCE):
 #   auto       probe UDP 5005 for an ESP32, else fall back to simulation (default)
@@ -30,15 +29,15 @@ services:
     container_name: ruview
     hostname: ruview
     labels:
-      icon: https://cdn.jsdelivr.net/gh/Aiacos/ruview@main/assets/ruview-icon.png
+      icon: https://cdn.jsdelivr.net/gh/ruvnet/RuView@main/assets/ruview-icon.png
     ports:
       - mode: ingress
         target: 3000
-        published: "3030"
+        published: "3000"
         protocol: tcp
       - mode: ingress
         target: 3001
-        published: "3031"
+        published: "3001"
         protocol: tcp
       - mode: ingress
         target: 5005
@@ -72,15 +71,14 @@ x-casaos:
   developer: ruvnet
   category: HomeAutomation
   hostname: ""
-  icon: https://cdn.jsdelivr.net/gh/Aiacos/ruview@main/assets/ruview-icon.png
+  icon: https://cdn.jsdelivr.net/gh/ruvnet/RuView@main/assets/ruview-icon.png
   index: /ui/index.html
   is_uncontrolled: false
-  port_map: "3030"
-  webui_port: 3030
+  port_map: "3000"
+  webui_port: 3000
   scheme: http
   tagline:
     en_us: See through walls with WiFi — contactless presence, breathing & pose sensing
-    custom: Vedere attraverso i muri con il WiFi — presenza, respiro e posa senza contatto
   description:
     en_us: |
       RuView (WiFi DensePose) turns ordinary WiFi into a contactless spatial
@@ -90,21 +88,11 @@ x-casaos:
       wearables. This image runs the Rust sensing server with its web dashboard.
       With CSI_SOURCE=simulated it works with synthetic data and no hardware;
       point one or more ESP32-S3 CSI nodes at UDP 5005 for live sensing.
-    custom: |
-      RuView (WiFi DensePose) trasforma il normale WiFi in un sensore spaziale
-      senza contatto. Usando le Channel State Information (CSI) di nodi ESP32-S3
-      a basso costo rileva le persone attraverso i muri, stima respiro e battito
-      cardiaco, traccia movimento e cadute ed esegue la stima della posa a 17
-      punti — niente telecamere, niente dispositivi indossabili. Questa immagine
-      avvia il server Rust con la dashboard web. Con CSI_SOURCE=simulated funziona
-      con dati sintetici senza hardware; per il sensing dal vivo invia le CSI di
-      uno o più nodi ESP32-S3 sulla porta UDP 5005.
   title:
     en_us: RuView
-    custom: RuView
-  thumbnail: https://cdn.jsdelivr.net/gh/Aiacos/ruview@main/assets/ruview-icon.png
+  thumbnail: https://cdn.jsdelivr.net/gh/ruvnet/RuView@main/assets/ruview-icon.png
   screenshot_link:
-    - https://cdn.jsdelivr.net/gh/Aiacos/ruview@main/assets/ruview-icon.png
+    - https://cdn.jsdelivr.net/gh/ruvnet/RuView@main/assets/ruview-icon.png
   envs:
     - container: CSI_SOURCE
       description:
@@ -121,13 +109,13 @@ x-casaos:
   ports:
     - container: "3000"
       description:
-        en_us: "Web UI + REST API (HTTP). Published on host port 3030."
+        en_us: "Web UI + REST API (HTTP)."
     - container: "3001"
       description:
-        en_us: "WebSocket sensing stream. Published on host port 3031."
+        en_us: "WebSocket sensing stream."
     - container: "5005"
       description:
-        en_us: "ESP32-S3 CSI ingest (UDP). Published on host port 5005."
+        en_us: "ESP32-S3 CSI ingest (UDP)."
   volumes:
     - container: /app/models
       description:
