@@ -13,7 +13,9 @@
 # Import into CasaOS:  App Store → Custom Install → paste this file, OR
 #   cd /DATA/AppData/ruview && docker compose -f docker-compose.casaos.yml up -d
 #
-# Open the dashboard at:  http://192.168.1.177:3030
+# Open the dashboard at:  http://192.168.1.177:3030/ui/index.html
+# (the bare http://<host>:3030/ root is just an API index — the visual
+#  dashboards live under /ui/: index.html, observatory.html, pose-fusion.html)
 #
 # Data source (CSI_SOURCE):
 #   auto       probe UDP 5005 for an ESP32, else fall back to simulation (default)
@@ -38,7 +40,8 @@ services:
         target: 3001
         published: "3031"
         protocol: tcp
-      - target: 5005
+      - mode: ingress
+        target: 5005
         published: "5005"
         protocol: udp
     environment:
@@ -70,9 +73,10 @@ x-casaos:
   category: HomeAutomation
   hostname: ""
   icon: https://cdn.jsdelivr.net/gh/Aiacos/ruview@main/assets/ruview-icon.png
-  index: /
+  index: /ui/index.html
   is_uncontrolled: false
   port_map: "3030"
+  webui_port: 3030
   scheme: http
   tagline:
     en_us: See through walls with WiFi — contactless presence, breathing & pose sensing
@@ -99,3 +103,32 @@ x-casaos:
     en_us: RuView
     custom: RuView
   thumbnail: https://cdn.jsdelivr.net/gh/Aiacos/ruview@main/assets/ruview-icon.png
+  screenshot_link:
+    - https://cdn.jsdelivr.net/gh/Aiacos/ruview@main/assets/ruview-icon.png
+  envs:
+    - container: CSI_SOURCE
+      description:
+        en_us: "Data source: auto (default) | esp32 | simulated. 'simulated' needs no hardware."
+    - container: RUVIEW_API_TOKEN
+      description:
+        en_us: "(Optional) bearer token to protect /api/v1/*. Leave empty for LAN-only use."
+    - container: MODELS_DIR
+      description:
+        en_us: "In-container path scanned for .rvf model files (default /app/models)."
+    - container: RUST_LOG
+      description:
+        en_us: "Log level: info (default), debug, warn, error."
+  ports:
+    - container: "3000"
+      description:
+        en_us: "Web UI + REST API (HTTP). Published on host port 3030."
+    - container: "3001"
+      description:
+        en_us: "WebSocket sensing stream. Published on host port 3031."
+    - container: "5005"
+      description:
+        en_us: "ESP32-S3 CSI ingest (UDP). Published on host port 5005."
+  volumes:
+    - container: /app/models
+      description:
+        en_us: "Holds .rvf model files exposed via /api/v1/models."

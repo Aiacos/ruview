@@ -24,8 +24,13 @@ CSI_SOURCE=simulated docker compose -f docker-compose.casaos.yml up -d
 Then open the dashboard:
 
 ```
-http://<host-ip>:3030
+http://<host-ip>:3030/ui/index.html
 ```
+
+> The bare root `http://<host-ip>:3030/` is only an **API index** (a plain list
+> of endpoints) — the visual dashboards live under `/ui/`:
+> `index.html` (main), `observatory.html` (live feed), `pose-fusion.html`
+> (webcam + CSI), `viz.html` (3D).
 
 `CSI_SOURCE=simulated` feeds the pipeline with synthetic CSI so you can explore
 the dashboard, API, and vital-sign/pose visualizations without any hardware.
@@ -106,7 +111,7 @@ description, port map), so CasaOS shows it as a proper app tile.
    customized app").
 2. Switch to the **Import** / YAML view and paste the contents of
    `docker-compose.casaos.yml`.
-3. Install. The tile opens `http://<host-ip>:3030`.
+3. Install. The tile opens `http://<host-ip>:3030/ui/index.html`.
 
 **Option B — CLI (CasaOS still detects the container)**
 
