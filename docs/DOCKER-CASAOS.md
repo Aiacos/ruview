@@ -18,7 +18,7 @@ host does **not** need to compile the Rust workspace.
 
 ```bash
 cd ruview
-CSI_SOURCE=simulated docker compose -f docker-compose.casaos.yml up -d
+CSI_SOURCE=simulated docker compose -f docker-compose.yml up -d
 ```
 
 Then open the dashboard:
@@ -38,14 +38,14 @@ the dashboard, API, and vital-sign/pose visualizations without any hardware.
 Stop / remove:
 
 ```bash
-docker compose -f docker-compose.casaos.yml down
+docker compose -f docker-compose.yml down
 ```
 
 ---
 
 ## 2. Ports
 
-The compose file (`docker-compose.casaos.yml`) publishes these host ports:
+The compose file (`docker-compose.yml`) publishes these host ports:
 
 | Service                | Container | Host | Notes |
 |------------------------|-----------|------|-------|
@@ -54,7 +54,7 @@ The compose file (`docker-compose.casaos.yml`) publishes these host ports:
 | ESP32 CSI ingest       | 5005/udp  | **5005** | ESP32-S3 nodes stream CSI frames here |
 
 If a host port clashes on your machine, edit the `published:` values in
-`docker-compose.casaos.yml` (and update `port_map` / `webui_port` in the
+`docker-compose.yml` (and update `port_map` / `webui_port` in the
 `x-casaos` block to match the new UI port). The dashboard's WebSocket URL is
 derived from the page host, so keep the API and WS ports reachable from the same
 hostname.
@@ -96,7 +96,7 @@ Leave `RUVIEW_API_TOKEN` empty for LAN-only use. Set it to require
 `Authorization: Bearer <token>` on `/api/v1/*`:
 
 ```bash
-RUVIEW_API_TOKEN=$(openssl rand -hex 32) docker compose -f docker-compose.casaos.yml up -d
+RUVIEW_API_TOKEN=$(openssl rand -hex 32) docker compose -f docker-compose.yml up -d
 ```
 
 ---
@@ -111,14 +111,14 @@ description, port map), so CasaOS shows it as a proper app tile.
 1. CasaOS dashboard → **App Store** → **Custom Install** (the `+` / "Install a
    customized app").
 2. Switch to the **Import** / YAML view and paste the contents of
-   `docker-compose.casaos.yml`.
+   `docker-compose.yml`.
 3. Install. The tile opens `http://<host-ip>:3000/ui/index.html`.
 
 **Option B — CLI (CasaOS still detects the container)**
 
 ```bash
 cd ruview
-docker compose -f docker-compose.casaos.yml up -d
+docker compose -f docker-compose.yml up -d
 ```
 
 > **Icon:** the manifest points at
@@ -157,8 +157,8 @@ detection, pose) needs **Channel State Information** from a CSI-capable node.
 docker logs ruview -f --tail 100
 
 # Restart / update to the latest image
-docker compose -f docker-compose.casaos.yml pull
-docker compose -f docker-compose.casaos.yml up -d
+docker compose -f docker-compose.yml pull
+docker compose -f docker-compose.yml up -d
 
 # Status of the running server
 curl -s http://<host-ip>:3000/api/v1/status
@@ -171,4 +171,4 @@ curl -s http://<host-ip>:3000/api/v1/status
 - *Multiple ESP32 nodes on Docker Desktop for Windows:* multi-source UDP collapses
   to one source IP at the WSL boundary. Use the host relay (see
   `docs/TROUBLESHOOTING.md §9`). Native Linux/CasaOS hosts are unaffected.
-- *Port clash on 3000/3001:* edit `published:` in `docker-compose.casaos.yml`.
+- *Port clash on 3000/3001:* edit `published:` in `docker-compose.yml`.

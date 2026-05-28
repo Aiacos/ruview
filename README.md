@@ -80,7 +80,7 @@ docker pull ruvnet/wifi-densepose:latest
 docker run -p 3000:3000 ruvnet/wifi-densepose:latest
 # Open http://localhost:3000
 # CasaOS / docker compose? See docs/DOCKER-CASAOS.md (ready-made
-# docker-compose.casaos.yml with an app tile)
+# docker-compose.yml with an app tile)
 
 # Option 2: Live sensing with ESP32-S3 hardware ($9)
 # Flash firmware, provision WiFi, and start sensing:
@@ -563,7 +563,7 @@ Verify the plugin structure: `bash plugins/ruview/scripts/smoke.sh`. Full detail
 | Document | Description |
 |----------|-------------|
 | [User Guide](docs/user-guide.md) | Step-by-step guide: installation, first run, API usage, hardware setup, training |
-| [Docker & CasaOS](docs/DOCKER-CASAOS.md) | Run the sensing server via Docker / `docker-compose.casaos.yml`, import as a CasaOS app tile, and connect ESP32-S3 nodes |
+| [Docker & CasaOS](docs/DOCKER-CASAOS.md) | Run the sensing server via Docker / `docker-compose.yml`, import as a CasaOS app tile, and connect ESP32-S3 nodes |
 | [Build Guide](docs/build-guide.md) | Building from source (Rust and Python) |
 | [Claude Code / Codex Plugin](plugins/ruview/README.md) | The `ruview` plugin + marketplace — skills, `/ruview-*` commands, agents, and the Codex prompt mirror |
 | [Architecture Decisions](docs/adr/README.md) | 96 ADRs — why each technical choice was made, organized by domain (hardware, signal processing, ML, platform, infrastructure) |
